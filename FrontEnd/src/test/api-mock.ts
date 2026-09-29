@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { authResponse, healthy } from './fixtures';
+import { authResponse, healthy, makeDashboard } from './fixtures';
 import type { User } from '@/types/user';
 
 export interface MockRequest {
@@ -27,6 +27,7 @@ export function sessionRoutes(user: User | null): Routes {
       user ? json(authResponse(user)) : apiError(401, 'INVALID_REFRESH_TOKEN'),
     'GET /users/me': () => (user ? json(user) : apiError(401, 'UNAUTHORIZED')),
     'GET /health': () => json(healthy),
+    'GET /dashboard': () => (user ? json(makeDashboard()) : apiError(401, 'UNAUTHORIZED')),
   };
 }
 

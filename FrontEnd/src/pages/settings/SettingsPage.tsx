@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { AboutSettings } from './AboutSettings';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { DeleteAccountDialog } from './DeleteAccountDialog';
@@ -69,6 +70,7 @@ export default function SettingsPage() {
             <DeleteAccountDialog />
           </CardContent>
         </Card>
+        <AboutSettings />
       </div>
     </>
   );

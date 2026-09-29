@@ -5,7 +5,7 @@
 VYRO est une plateforme sportive personnelle : entraînements, activités, poids, objectifs, records,
 statistiques et progression, réunis dans une PWA moderne, mobile-first et installable.
 
-> **Statut : Phase 3 — Design System terminée.** Comptes, sessions sécurisées, onboarding,
+> **Statut : Phase 4 — Dashboard terminée.** Comptes, sessions sécurisées, onboarding,
 > profil et paramètres de compte fonctionnent de bout en bout. Les fonctionnalités sportives
 > (entraînements, poids…) arrivent phase par phase — voir [`docs/roadmap.md`](docs/roadmap.md).
 

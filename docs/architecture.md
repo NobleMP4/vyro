@@ -79,6 +79,14 @@ Requêtes API                       → Authorization: Bearer <accessToken>   (1
 - Changement ou réinitialisation du mot de passe : toutes les sessions sont révoquées.
 - Suppression du compte : suppression définitive en cascade (pas de soft delete).
 
+### Dashboard
+
+`GET /api/v1/dashboard` agrège côté serveur ce que la page d'accueil affiche. Chaque section
+porte un statut : `READY` (avec `data`), `EMPTY` (fonctionnalité disponible, aucune donnée)
+ou `UNAVAILABLE` (fonctionnalité pas encore livrée). Les dates (« aujourd'hui », semaine
+lundi → dimanche, séries) sont calculées dans le fuseau `Profile.timezone`
+(`src/common/time/zoned-date.ts`, Intl uniquement).
+
 ### Format d'erreur
 
 Toutes les erreurs ont la même forme :

@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { useCompleteOnboarding, useCurrentUser } from '@/hooks/useCurrentUser';
 import { getErrorMessage } from '@/lib/error-messages';
+import { deviceTimeZone } from '@/lib/timezone';
 import { displayNameSchema } from '@/lib/validation';
 import { paths } from '@/router/paths';
 
@@ -111,12 +112,15 @@ export default function OnboardingPage() {
   };
 
   const onSubmit = handleSubmit((values) =>
-    completeOnboarding.mutate(values, {
-      onSuccess: (updated) => {
-        toast.success(`C’est parti, ${updated.profile.displayName} !`);
-        navigate(paths.dashboard, { replace: true });
+    completeOnboarding.mutate(
+      { ...values, timezone: deviceTimeZone() },
+      {
+        onSuccess: (updated) => {
+          toast.success(`C’est parti, ${updated.profile.displayName} !`);
+          navigate(paths.dashboard, { replace: true });
+        },
       },
-    }),
+    ),
   );
 
   return (

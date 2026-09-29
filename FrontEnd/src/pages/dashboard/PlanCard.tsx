@@ -3,14 +3,11 @@ import { Link } from 'react-router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { ACTIVITY_LABELS, MAIN_GOAL_LABELS } from '@/lib/labels';
 import { paths } from '@/router/paths';
+import type { Dashboard } from '@/types/dashboard';
 
-/** The user's plan from onboarding. Progress numbers arrive with workout tracking. */
-export function WeeklyTargetCard() {
-  const { profile } = useCurrentUser();
-
+export function PlanCard({ plan }: { plan: Dashboard['plan'] }) {
   return (
     <Card>
       <CardHeader className="flex-row items-start gap-3">
@@ -20,24 +17,14 @@ export function WeeklyTargetCard() {
         <div>
           <CardTitle>Ton cap</CardTitle>
           <CardDescription>
-            {profile.mainGoal ? MAIN_GOAL_LABELS[profile.mainGoal].label : 'Aucun objectif défini'}
+            {plan.mainGoal ? MAIN_GOAL_LABELS[plan.mainGoal].label : 'Aucun objectif défini'}
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {profile.weeklyWorkoutTarget && (
-          <p>
-            <span className="text-3xl font-semibold tracking-tight">
-              {profile.weeklyWorkoutTarget}
-            </span>{' '}
-            <span className="text-muted-foreground">
-              entraînement{profile.weeklyWorkoutTarget > 1 ? 's' : ''} par semaine
-            </span>
-          </p>
-        )}
-        {profile.favoriteActivities.length > 0 && (
+      <CardContent className="space-y-3">
+        {plan.favoriteActivities.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {profile.favoriteActivities.map((activity) => (
+            {plan.favoriteActivities.map((activity) => (
               <Badge key={activity} variant="outline">
                 {ACTIVITY_LABELS[activity]}
               </Badge>

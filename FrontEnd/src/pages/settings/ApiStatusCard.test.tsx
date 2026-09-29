@@ -6,13 +6,13 @@ import { renderApp } from '@/test/render';
 
 describe('ApiStatusCard', () => {
   it('shows the live API status', async () => {
-    renderApp('/');
+    renderApp('/settings');
     expect(await screen.findByText('Opérationnel')).toBeInTheDocument();
     expect(screen.getByText('Connectée')).toBeInTheDocument();
   });
 
   it('reports a degraded API when the database is down (HTTP 503)', async () => {
-    renderApp('/', {
+    renderApp('/settings', {
       routes: {
         'GET /health': () => json({ ...healthy, status: 'degraded', database: 'down' }, 503),
       },
@@ -24,7 +24,7 @@ describe('ApiStatusCard', () => {
   it('shows a friendly error and lets the user retry', async () => {
     let calls = 0;
     const user = userEvent.setup();
-    renderApp('/', {
+    renderApp('/settings', {
       routes: {
         'GET /health': () => {
           calls += 1;

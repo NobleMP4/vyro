@@ -28,6 +28,7 @@ export interface Profile {
   distanceUnit: DistanceUnit;
   heightUnit: HeightUnit;
   theme: ThemePreferenceApi;
+  timezone: string;
   gamificationEnabled: boolean;
   mainGoal: MainGoal | null;
   weeklyWorkoutTarget: number | null;
@@ -59,4 +60,5 @@ export interface OnboardingInput {
   weightUnit: WeightUnit;
   distanceUnit: DistanceUnit;
   heightUnit: HeightUnit;
+  timezone?: string;
 }

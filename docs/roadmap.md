@@ -8,8 +8,8 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 | 1  | Foundation                 | ✅ Terminée |
 | 2  | Authentification           | ✅ Terminée |
 | 3  | Design System (complément) | ✅ Terminée |
-| 4  | Dashboard                  | ⏭️ Suivante |
-| 5  | Exercices                  | À faire     |
+| 4  | Dashboard                  | ✅ Terminée |
+| 5  | Exercices                  | ⏭️ Suivante |
 | 6  | Entraînements              | À faire     |
 | 7  | Poids                      | À faire     |
 | 8  | Activités                  | À faire     |
@@ -64,7 +64,23 @@ connexion via fournisseurs tiers, notifications.
 - [x] Page de référence vivante `/design-system` (dev uniquement) + `docs/design-system.md`
 - [x] Appliqué : réglage gamification (Paramètres), chiffres du dashboard
 
-## Phase 4 — Dashboard (prochaine)
+## Phase 4 — Dashboard ✅
 
-- Structure définitive du dashboard : semaine en cours, progression, objectif, records, série
-- Remplissage au fil des phases suivantes avec les vraies données (aucune donnée fictive)
+- [x] `GET /api/v1/dashboard` : l'API est la source de vérité de tout ce que le dashboard affiche
+- [x] Chaque section a un statut `READY` / `EMPTY` / `UNAVAILABLE` : une fonctionnalité non
+      encore livrée n'est jamais affichée avec des chiffres inventés
+- [x] Fuseau horaire de l'utilisateur (`Profile.timezone`), synchronisé depuis l'appareil :
+      « aujourd'hui » et la semaine lundi → dimanche sont calculés dans son fuseau
+- [x] Accueil selon l'heure, semaine en cours (jour courant), objectif hebdomadaire, cap,
+      « Premiers pas » calculés par l'API, carte « Bientôt » pour les sections à venir
+- [x] Statut technique du serveur déplacé dans Paramètres › À propos
+- [x] Tests unitaires, intégration (MySQL) et FrontEnd
+
+Chaque phase suivante remplace le statut `UNAVAILABLE` de sa section par un vrai calcul :
+activité de la semaine et série (Phase 6), poids (Phase 7), records (Phase 9).
+
+## Phase 5 — Exercices (prochaine)
+
+- API catalogue : liste paginée, recherche, filtres (groupe musculaire, équipement,
+  difficulté), détail ; exercices personnalisés de l'utilisateur
+- Bibliothèque FrontEnd : recherche, filtres, fiches détaillées

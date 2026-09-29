@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { deviceTimeZone } from '@/lib/timezone';
 import { json } from '@/test/api-mock';
 import { makeUser } from '@/test/fixtures';
 import { renderApp } from '@/test/render';
@@ -54,7 +55,9 @@ describe('Onboarding', () => {
     await user.click(screen.getByRole('radio', { name: 'lb' }));
     await user.click(screen.getByRole('button', { name: 'Commencer' }));
 
-    expect(await screen.findByRole('heading', { name: /Bonjour Alex/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /(Bonjour|Bonsoir) Alex/ }),
+    ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/');
     expect(api.callsTo('POST /users/me/onboarding')[0].body).toEqual({
       displayName: 'Alex',
@@ -64,6 +67,7 @@ describe('Onboarding', () => {
       weightUnit: 'LB',
       distanceUnit: 'KM',
       heightUnit: 'CM',
+      timezone: deviceTimeZone(),
     });
   });
 });

@@ -3,6 +3,7 @@ import { BottomNav } from '@/components/navigation/BottomNav';
 import { MobileTopBar } from '@/components/navigation/MobileTopBar';
 import { NavigationProgress } from '@/components/navigation/NavigationProgress';
 import { Sidebar } from '@/components/navigation/Sidebar';
+import { TimezoneSync } from '@/components/profile/TimezoneSync';
 import { ThemeSync } from '@/components/theme/ThemeSync';
 
 /**
@@ -19,6 +20,7 @@ export function AppLayout() {
         Aller au contenu
       </a>
       <ThemeSync />
+      <TimezoneSync />
       <NavigationProgress />
       <Sidebar />
       <MobileTopBar />

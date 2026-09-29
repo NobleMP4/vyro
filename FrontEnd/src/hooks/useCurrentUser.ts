@@ -21,7 +21,11 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: UpdateProfileInput) => usersService.updateProfile(input),
-    onSuccess: (user) => queryClient.setQueryData(queryKeys.me, user),
+    onSuccess: (user) => {
+      queryClient.setQueryData(queryKeys.me, user);
+      // Goal, target and profile completion feed the dashboard.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    },
   });
 }
 
@@ -29,6 +33,9 @@ export function useCompleteOnboarding() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: OnboardingInput) => usersService.completeOnboarding(input),
-    onSuccess: (user) => queryClient.setQueryData(queryKeys.me, user),
+    onSuccess: (user) => {
+      queryClient.setQueryData(queryKeys.me, user);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    },
   });
 }

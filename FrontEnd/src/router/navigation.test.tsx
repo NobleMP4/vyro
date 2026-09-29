@@ -5,12 +5,14 @@ import { renderApp } from '@/test/render';
 describe('App navigation', () => {
   it('greets the signed-in user on the dashboard', async () => {
     renderApp('/');
-    expect(await screen.findByRole('heading', { name: /Bonjour Alex/ })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /(Bonjour|Bonsoir) Alex/ }),
+    ).toBeInTheDocument();
   });
 
   it('exposes every main section in the desktop sidebar', async () => {
     renderApp('/');
-    await screen.findByRole('heading', { name: /Bonjour/ });
+    await screen.findByRole('heading', { name: /(Bonjour|Bonsoir)/ });
     const [sidebar] = screen.getAllByRole('navigation', { name: 'Navigation principale' });
     for (const label of [
       'Dashboard',
@@ -31,7 +33,7 @@ describe('App navigation', () => {
   it('navigates between pages and marks the active link', async () => {
     const user = userEvent.setup();
     renderApp('/');
-    await screen.findByRole('heading', { name: /Bonjour/ });
+    await screen.findByRole('heading', { name: /(Bonjour|Bonsoir)/ });
 
     const [sidebar] = screen.getAllByRole('navigation', { name: 'Navigation principale' });
     await user.click(within(sidebar).getByRole('link', { name: 'Paramètres' }));
