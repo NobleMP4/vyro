@@ -1,0 +1,177 @@
+// VYRO — Prisma schema
+//
+// Phase 1 (Foundation) only models what the next phases build on directly:
+// accounts, profiles, refresh tokens and the exercise catalog.
+// Workouts, activities, weight, goals, records… are added in their own phases
+// through dedicated migrations. See docs/architecture.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Accounts
+// ─────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique @db.VarChar(254)
+  passwordHash String    @db.VarChar(255)
+  role         UserRole  @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  /// Soft delete: the account is anonymised then purged asynchronously.
+  deletedAt    DateTime?
+
+  profile       Profile?
+  refreshTokens RefreshToken[]
+  exercises     Exercise[]
+
+  @@index([deletedAt])
+}
+
+enum WeightUnit {
+  KG
+  LB
+}
+
+enum DistanceUnit {
+  KM
+  MI
+}
+
+enum HeightUnit {
+  CM
+  FT
+}
+
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+model Profile {
+  id                  String          @id @default(cuid())
+  userId              String          @unique
+  displayName         String          @db.VarChar(50)
+  avatarUrl           String?         @db.VarChar(500)
+  birthDate           DateTime?       @db.Date
+  heightCm            Decimal?        @db.Decimal(5, 1)
+  weightUnit          WeightUnit      @default(KG)
+  distanceUnit        DistanceUnit    @default(KM)
+  heightUnit          HeightUnit      @default(CM)
+  theme               ThemePreference @default(SYSTEM)
+  gamificationEnabled Boolean         @default(true)
+  onboardingCompleted Boolean         @default(false)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  /// SHA-256 of the token — the raw token is never stored.
+  tokenHash String    @unique @db.Char(64)
+  /// Tokens issued by rotation share a family, so reuse of a revoked token
+  /// can revoke the whole chain.
+  family    String    @db.VarChar(36)
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?   @db.VarChar(255)
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([family])
+  @@index([expiresAt])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Exercise catalog
+// ─────────────────────────────────────────────────────────────
+
+enum MuscleGroup {
+  CHEST
+  BACK
+  SHOULDERS
+  BICEPS
+  TRICEPS
+  FOREARMS
+  CORE
+  QUADRICEPS
+  HAMSTRINGS
+  GLUTES
+  CALVES
+  FULL_BODY
+  CARDIO
+}
+
+enum Equipment {
+  BODYWEIGHT
+  BARBELL
+  DUMBBELL
+  KETTLEBELL
+  MACHINE
+  CABLE
+  BAND
+  EZ_BAR
+  SMITH_MACHINE
+  OTHER
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+/// Which metrics a set of this exercise records (drives the set input UI).
+enum ExerciseTrackingType {
+  WEIGHT_REPS
+  REPS
+  DURATION
+  DISTANCE_DURATION
+}
+
+model Exercise {
+  id           String               @id @default(cuid())
+  /// Stable key for catalog exercises (seed upserts on it). Null for custom ones.
+  slug         String?              @unique @db.VarChar(100)
+  name         String               @db.VarChar(100)
+  description  String?              @db.Text
+  instructions String?              @db.Text
+  tips         String?              @db.Text
+  muscleGroup  MuscleGroup
+  /// Secondary muscles, stored as a JSON array of MuscleGroup values.
+  secondaryMuscles Json?
+  equipment    Equipment
+  difficulty   Difficulty           @default(BEGINNER)
+  trackingType ExerciseTrackingType @default(WEIGHT_REPS)
+  mediaUrl     String?              @db.VarChar(500)
+  /// Null = catalog exercise shared by everyone; set = user's custom exercise.
+  ownerId      String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  deletedAt    DateTime?
+
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([muscleGroup])
+  @@index([equipment])
+  @@index([ownerId])
+  @@index([name])
+}
