@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": { "rootDir": "./src" },
+  "compilerOptions": {
+    "rootDir": "./src",
+    // Nest wipes dist/ before each build; a build info file kept outside it
+    // would make tsc skip emitting files it believes are up to date.
+    "incremental": false
+  },
   "include": ["src"],
   "exclude": ["node_modules", "test", "dist", "prisma", "**/*spec.ts"]
 }

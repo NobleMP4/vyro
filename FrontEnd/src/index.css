@@ -1,0 +1,158 @@
+@import 'tailwindcss';
+
+/* Class-based dark mode, driven by ThemeProvider (light | dark | system). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * VYRO design tokens.
+ * Brand accent "Volt" — an electric lime used sparingly: primary actions,
+ * active navigation, key numbers. Everything else stays neutral.
+ */
+:root {
+  --background: #f5f6f3;
+  --foreground: #0b0d0e;
+  --card: #ffffff;
+  --card-foreground: #0b0d0e;
+  --muted: #eceee9;
+  --muted-foreground: #5c635d;
+  --border: #e0e3dc;
+  --input: #d6dad2;
+  --ring: #7fa600;
+
+  --primary: #c6f135;
+  --primary-foreground: #0b0d0e;
+  /* Brand color for text/icons on light surfaces (volt is too light for text). */
+  --brand: #4a6800;
+
+  --secondary: #0b0d0e;
+  --secondary-foreground: #f5f6f3;
+
+  --destructive: #d93d42;
+  --destructive-foreground: #ffffff;
+  --success: #1f9d5c;
+  --warning: #c98512;
+  --info: #3269e6;
+
+  --radius: 1rem;
+  --shadow-card: 0 1px 2px rgb(11 13 14 / 0.04), 0 4px 16px rgb(11 13 14 / 0.04);
+}
+
+.dark {
+  --background: #0a0b0c;
+  --foreground: #f1f3ef;
+  --card: #131517;
+  --card-foreground: #f1f3ef;
+  --muted: #1b1e21;
+  --muted-foreground: #939a9f;
+  --border: #23272b;
+  --input: #2d3237;
+  --ring: #cbff3d;
+
+  --primary: #cbff3d;
+  --primary-foreground: #0a0b0c;
+  --brand: #cbff3d;
+
+  --secondary: #f1f3ef;
+  --secondary-foreground: #0a0b0c;
+
+  --destructive: #f2555a;
+  --destructive-foreground: #0a0b0c;
+  --success: #3ccf85;
+  --warning: #f0b547;
+  --info: #6b95ff;
+
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--brand);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-card: var(--shadow-card);
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, sans-serif;
+
+  --animate-fade-up: fade-up 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background outline-none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Safe areas for notched devices / installed PWA. */
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
