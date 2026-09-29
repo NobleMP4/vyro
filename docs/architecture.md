@@ -58,6 +58,27 @@ workouts/
 - Validation globale : `whitelist` + `forbidNonWhitelisted` — tout champ inconnu est refusé
 - Sécurité : Helmet, CORS limité à `FRONTEND_URL`, secrets JWT obligatoires en production
 
+### Authentification
+
+```text
+POST /auth/register | /auth/login  → { accessToken, user } + cookie vyro_refresh (httpOnly)
+Requêtes API                       → Authorization: Bearer <accessToken>   (15 min)
+401 TOKEN_EXPIRED                  → POST /auth/refresh (cookie + X-VYRO-Client) → nouveau couple
+```
+
+- **Access token** : JWT HS256 signé avec `JWT_SECRET`, vérifié sans accès base. Gardé en mémoire
+  côté FrontEnd (jamais dans `localStorage`).
+- **Refresh token** : chaîne aléatoire de 256 bits, stockée en base sous forme de HMAC
+  (`JWT_REFRESH_SECRET`), cookie `httpOnly` limité au chemin `/api/v1/auth`. Rotation à chaque
+  usage ; rejouer un ancien token hors d'une fenêtre de 20 s (courses entre onglets) révoque
+  toute la famille de sessions.
+- **CSRF** : les routes authentifiées par cookie (`refresh`, `logout`) exigent l'en-tête
+  `X-VYRO-Client`, impossible à envoyer cross-site sans pré-vérification CORS.
+- Toutes les routes exigent un token sauf celles marquées `@Public()` ; `@Roles()` restreint par rôle.
+- Rate limiting : limite globale + limite stricte (`AUTH_RATE_LIMIT`/min/IP) via `@SensitiveThrottle()`.
+- Changement ou réinitialisation du mot de passe : toutes les sessions sont révoquées.
+- Suppression du compte : suppression définitive en cascade (pas de soft delete).
+
 ### Format d'erreur
 
 Toutes les erreurs ont la même forme :
@@ -78,13 +99,14 @@ Toutes les erreurs ont la même forme :
 - Toute autre erreur devient 500 `INTERNAL_ERROR` : la stack est journalisée, jamais renvoyée.
 - Les codes sont stables : le FrontEnd les traduit en messages (`FrontEnd/src/lib/error-messages.ts`).
 
-### Modèle de données (Phase 1)
+### Modèle de données (Phases 1–2)
 
 | Modèle         | Rôle                                                                        |
 | -------------- | --------------------------------------------------------------------------- |
-| `User`         | Compte (email unique, hash du mot de passe, rôle, soft delete)              |
-| `Profile`      | Nom affiché, unités (kg/lb, km/mi, cm/ft), thème, préférences               |
-| `RefreshToken` | Hash SHA-256 du token, famille de rotation, expiration, révocation          |
+| `User`         | Compte (email unique, hash Argon2id, rôle, dernière connexion)              |
+| `Profile`      | Nom affiché, unités, thème, objectif principal, fréquence, activités, onboarding |
+| `RefreshToken` | HMAC du token, famille de rotation, expiration, révocation                  |
+| `PasswordResetToken` | HMAC du token envoyé par email, expiration (1 h), usage unique        |
 | `Exercise`     | Catalogue partagé (`ownerId = null`, clé `slug`) ou exercice personnel      |
 
 Les autres entités (`Workout`, `WorkoutExercise`, `WorkoutSet`, `Activity`, `WeightEntry`, `Goal`,

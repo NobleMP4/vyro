@@ -3,6 +3,7 @@ import { BottomNav } from '@/components/navigation/BottomNav';
 import { MobileTopBar } from '@/components/navigation/MobileTopBar';
 import { NavigationProgress } from '@/components/navigation/NavigationProgress';
 import { Sidebar } from '@/components/navigation/Sidebar';
+import { ThemeSync } from '@/components/theme/ThemeSync';
 
 /**
  * Authenticated app shell: sidebar on desktop, top bar + bottom navigation on
@@ -17,6 +18,7 @@ export function AppLayout() {
       >
         Aller au contenu
       </a>
+      <ThemeSync />
       <NavigationProgress />
       <Sidebar />
       <MobileTopBar />

@@ -11,4 +11,9 @@ export const paths = {
   profile: '/profile',
   settings: '/settings',
   more: '/more',
+  onboarding: '/onboarding',
+  login: '/login',
+  register: '/register',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
 } as const;

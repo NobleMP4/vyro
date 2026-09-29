@@ -1,23 +1,48 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, LogOut } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { AppearanceSettings } from './AppearanceSettings';
+import { ChangePasswordDialog } from './ChangePasswordDialog';
+import { DeleteAccountDialog } from './DeleteAccountDialog';
+import { UnitsSettings } from './UnitsSettings';
 
 const UPCOMING_SECTIONS = [
-  { title: 'Compte', description: 'Nom, email, mot de passe, photo' },
-  { title: 'Unités', description: 'kg / lb, km / miles, cm / ft' },
   { title: 'Notifications', description: 'Rappels d’entraînement et de pesée' },
   { title: 'Intégrations', description: 'Apple Health, Google Health Connect' },
-  { title: 'Confidentialité', description: 'Export et suppression de tes données' },
+  { title: 'Export des données', description: 'JSON et CSV' },
 ];
 
 export default function SettingsPage() {
+  const { email } = useCurrentUser();
+  const { logout } = useAuth();
+
   return (
     <>
       <PageHeader title="Paramètres" description="Personnalise VYRO." />
       <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Compte</CardTitle>
+            <CardDescription>
+              Connecté en tant que <span className="font-medium text-foreground">{email}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <ChangePasswordDialog />
+            <Button variant="ghost" onClick={() => void logout()}>
+              <LogOut aria-hidden="true" />
+              Se déconnecter
+            </Button>
+          </CardContent>
+        </Card>
+
         <AppearanceSettings />
+        <UnitsSettings />
+
         <Card className="divide-y overflow-hidden">
           {UPCOMING_SECTIONS.map((section) => (
             <div key={section.title} className="flex items-center gap-4 px-5 py-4">
@@ -29,6 +54,18 @@ export default function SettingsPage() {
               <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
           ))}
+        </Card>
+
+        <Card className="border-destructive/30">
+          <CardHeader>
+            <CardTitle>Zone sensible</CardTitle>
+            <CardDescription>
+              La suppression de ton compte efface définitivement toutes tes données.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DeleteAccountDialog />
+          </CardContent>
         </Card>
       </div>
     </>

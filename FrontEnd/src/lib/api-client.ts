@@ -5,6 +5,25 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+/**
+ * Hooks installed by the auth layer (see lib/auth-session.ts). Kept as an
+ * injection point so the HTTP client has no dependency on auth state.
+ */
+export interface AuthHandlers {
+  getAccessToken: () => string | null;
+  /** Obtains a new access token; rejects when the session is over. */
+  refresh: () => Promise<void>;
+  onSessionExpired: () => void;
+}
+
+let authHandlers: AuthHandlers | null = null;
+
+export function setAuthHandlers(handlers: AuthHandlers | null): void {
+  authHandlers = handlers;
+}
+
+const EXPIRED_TOKEN_CODES = new Set(['TOKEN_EXPIRED', 'UNAUTHORIZED']);
+
 export interface RequestOptions {
   method?: HttpMethod;
   body?: unknown;
@@ -12,6 +31,8 @@ export interface RequestOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
   headers?: Record<string, string>;
+  /** Attach the access token and refresh it when expired (default true). */
+  auth?: boolean;
 }
 
 function buildUrl(path: string, query?: RequestOptions['query']): string {
@@ -37,11 +58,35 @@ async function parseBody(response: Response): Promise<unknown> {
  * Single entry point for every call to the VYRO API.
  * Components never call fetch directly: they go through services + TanStack Query.
  * Throws an ApiError for network failures, timeouts and non-2xx responses.
+ * An expired access token is refreshed transparently and the request retried once.
  */
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  try {
+    return await send<T>(path, options);
+  } catch (error) {
+    const canRefresh =
+      options.auth !== false &&
+      authHandlers !== null &&
+      error instanceof ApiError &&
+      error.status === 401 &&
+      EXPIRED_TOKEN_CODES.has(error.code);
+    if (!canRefresh) throw error;
+
+    try {
+      await authHandlers!.refresh();
+    } catch {
+      authHandlers?.onSessionExpired();
+      throw error;
+    }
+    return send<T>(path, options);
+  }
+}
+
+async function send<T>(path: string, options: RequestOptions): Promise<T> {
   const { method = 'GET', body, query, signal, timeoutMs = DEFAULT_TIMEOUT_MS, headers } = options;
   const timeout = AbortSignal.timeout(timeoutMs);
   const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
+  const token = options.auth !== false ? authHandlers?.getAccessToken() : null;
 
   let response: Response;
   try {
@@ -52,6 +97,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       headers: {
         Accept: 'application/json',
         ...(body !== undefined && { 'Content-Type': 'application/json' }),
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,

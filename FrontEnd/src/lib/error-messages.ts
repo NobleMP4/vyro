@@ -18,6 +18,13 @@ const MESSAGES_BY_CODE: Record<string, string> = {
   TOO_MANY_REQUESTS: 'Trop de tentatives. Patiente un peu avant de réessayer.',
   SERVICE_UNAVAILABLE: 'Le service est momentanément indisponible.',
   INTERNAL_ERROR: 'Une erreur inattendue est survenue. Réessaie plus tard.',
+  INVALID_CREDENTIALS: 'Email ou mot de passe incorrect.',
+  EMAIL_ALREADY_USED: 'Un compte existe déjà avec cet email.',
+  TOKEN_EXPIRED: 'Ta session a expiré. Reconnecte-toi.',
+  INVALID_REFRESH_TOKEN: 'Ta session a expiré. Reconnecte-toi.',
+  INVALID_RESET_TOKEN:
+    'Ce lien de réinitialisation est invalide ou a expiré. Fais une nouvelle demande.',
+  INVALID_PASSWORD: 'Mot de passe actuel incorrect.',
 };
 
 const FALLBACK = 'Une erreur est survenue. Réessaie.';

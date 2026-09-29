@@ -6,8 +6,8 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 | #  | Phase                      | Statut      |
 | -- | -------------------------- | ----------- |
 | 1  | Foundation                 | ✅ Terminée |
-| 2  | Authentification           | ⏭️ Suivante |
-| 3  | Design System (complément) | À faire     |
+| 2  | Authentification           | ✅ Terminée |
+| 3  | Design System (complément) | ⏭️ Suivante |
 | 4  | Dashboard                  | À faire     |
 | 5  | Exercices                  | À faire     |
 | 6  | Entraînements              | À faire     |
@@ -34,12 +34,24 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 - [x] Couche API (`apiRequest`, `ApiError`, traduction des erreurs), TanStack Query
 - [x] ESLint, Prettier, tests (Jest/Supertest, Vitest/Testing Library), CI GitHub Actions
 
-## Phase 2 — Authentification (prochaine)
+## Phase 2 — Authentification ✅
 
-- Inscription, connexion, déconnexion (hash Argon2/bcrypt)
-- Access token JWT court + refresh token en cookie `httpOnly`, rotation et détection de réutilisation
-- Guards NestJS, décorateur `@CurrentUser`, routes publiques explicites
-- Rate limiting (`@nestjs/throttler`) sur les routes d'auth
-- Mot de passe oublié / changement de mot de passe, suppression du compte
-- FrontEnd : pages d'auth (React Hook Form + Zod), routes protégées, refresh transparent
-- Onboarding court (pseudo, unités, objectif principal)
+- [x] Inscription, connexion, déconnexion — mots de passe hashés en Argon2id
+- [x] Access token JWT (15 min) en mémoire + refresh token opaque en cookie `httpOnly`
+      (30 j), rotation à chaque usage, détection de réutilisation (révocation de la famille)
+- [x] Refresh transparent côté FrontEnd (une seule requête, même avec plusieurs onglets)
+- [x] Protection CSRF des routes à cookie (en-tête `X-VYRO-Client`)
+- [x] Guard global (`@Public`, `@Roles`, `@CurrentUser`), rate limiting des routes sensibles
+- [x] Mot de passe oublié / réinitialisation (lien à usage unique, 1 h), changement de mot de passe
+      (déconnecte les autres appareils), suppression définitive du compte
+- [x] Onboarding en 3 étapes : pseudo, objectif, fréquence, activités, unités
+- [x] Profil (consultation / modification), paramètres : compte, apparence synchronisée, unités
+- [x] Tests : unitaires, e2e, intégration sur MySQL réel ; tests FrontEnd des parcours
+
+Hors périmètre, prévu plus tard : photo de profil (upload), vérification de l'adresse email,
+connexion via fournisseurs tiers, notifications.
+
+## Phase 3 — Design System (prochaine)
+
+- Compléter les composants partagés (select, textarea, tabs, sheet, tooltip, stat cards…)
+- États de chargement et animations homogènes, documentation des composants

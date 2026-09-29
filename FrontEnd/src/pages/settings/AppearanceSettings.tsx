@@ -1,10 +1,14 @@
-import { Monitor, Moon, Sun, type LucideIcon } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SegmentedControl, type SegmentOption } from '@/components/ui/segmented-control';
+import { useUpdateProfile } from '@/hooks/useCurrentUser';
 import { useTheme } from '@/hooks/useTheme';
-import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/error-messages';
 import type { ThemePreference } from '@/stores/theme-context';
+import type { ThemePreferenceApi } from '@/types/user';
 
-const OPTIONS: { value: ThemePreference; label: string; icon: LucideIcon }[] = [
+const OPTIONS: SegmentOption<ThemePreference>[] = [
   { value: 'light', label: 'Clair', icon: Sun },
   { value: 'dark', label: 'Sombre', icon: Moon },
   { value: 'system', label: 'Système', icon: Monitor },
@@ -12,37 +16,36 @@ const OPTIONS: { value: ThemePreference; label: string; icon: LucideIcon }[] = [
 
 export function AppearanceSettings() {
   const { preference, setPreference } = useTheme();
+  const updateProfile = useUpdateProfile();
+
+  const change = (value: ThemePreference) => {
+    const previous = preference;
+    setPreference(value); // instant, then saved on the account for other devices
+    updateProfile.mutate(
+      { theme: value.toUpperCase() as ThemePreferenceApi },
+      {
+        onError: (error) => {
+          setPreference(previous);
+          toast.error(getErrorMessage(error));
+        },
+      },
+    );
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Apparence</CardTitle>
-        <CardDescription>Choisis le thème de l’application.</CardDescription>
+        <CardDescription>Synchronisée sur tous tes appareils.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div role="radiogroup" aria-label="Thème" className="grid grid-cols-3 gap-2 sm:max-w-md">
-          {OPTIONS.map(({ value, label, icon: Icon }) => {
-            const selected = preference === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                onClick={() => setPreference(value)}
-                className={cn(
-                  'flex h-20 flex-col items-center justify-center gap-2 rounded-lg border text-sm font-medium transition-colors',
-                  selected
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted',
-                )}
-              >
-                <Icon className="size-5" aria-hidden="true" />
-                {label}
-              </button>
-            );
-          })}
-        </div>
+        <SegmentedControl
+          label="Thème"
+          value={preference}
+          options={OPTIONS}
+          onChange={change}
+          className="sm:max-w-md"
+        />
       </CardContent>
     </Card>
   );

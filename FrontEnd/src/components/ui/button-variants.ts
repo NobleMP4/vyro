@@ -20,6 +20,8 @@ export const buttonVariants = cva(
         icon: 'size-11',
       },
     },
+    // Links look like text: no button box whatever the size.
+    compoundVariants: [{ variant: 'link', className: 'h-auto px-0' }],
     defaultVariants: { variant: 'default', size: 'default' },
   },
 );

@@ -1,5 +1,9 @@
+import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { Logo } from '@/components/brand/Logo';
+import { UserAvatar } from '@/components/profile/UserAvatar';
+import { useAuth } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { accountNavItems, mainNavItems, type NavItem } from './nav-items';
 
@@ -28,6 +32,29 @@ function SidebarLink({ item }: { item: NavItem }) {
   );
 }
 
+function SidebarUser() {
+  const { profile, email } = useCurrentUser();
+  const { logout } = useAuth();
+  return (
+    <div className="mt-3 flex items-center gap-3 rounded-lg px-2 py-2">
+      <UserAvatar name={profile.displayName} className="size-9" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{profile.displayName}</p>
+        <p className="truncate text-xs text-muted-foreground">{email}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => void logout()}
+        aria-label="Se déconnecter"
+        title="Se déconnecter"
+        className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+      >
+        <LogOut className="size-4" />
+      </button>
+    </div>
+  );
+}
+
 /** Desktop navigation (lg and up). */
 export function Sidebar() {
   return (
@@ -44,13 +71,16 @@ export function Sidebar() {
             </li>
           ))}
         </ul>
-        <ul className="space-y-1 border-t pt-4">
-          {accountNavItems.map((item) => (
-            <li key={item.to}>
-              <SidebarLink item={item} />
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-1 border-t pt-4">
+          <ul className="space-y-1">
+            {accountNavItems.map((item) => (
+              <li key={item.to}>
+                <SidebarLink item={item} />
+              </li>
+            ))}
+          </ul>
+          <SidebarUser />
+        </div>
       </nav>
     </aside>
   );

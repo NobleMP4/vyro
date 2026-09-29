@@ -1,29 +1,16 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
-import { jsonResponse, renderApp } from '@/test/render';
-
-const healthy = {
-  status: 'ok',
-  database: 'up',
-  version: '0.1.0',
-  uptime: 1,
-  timestamp: '2026-01-01T00:00:00.000Z',
-};
+import { renderApp } from '@/test/render';
 
 describe('App navigation', () => {
-  beforeEach(() => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(jsonResponse(healthy));
-  });
-
-  it('renders the dashboard on /', async () => {
+  it('greets the signed-in user on the dashboard', async () => {
     renderApp('/');
-    expect(await screen.findByRole('heading', { name: /Bienvenue sur VYRO/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Bonjour Alex/ })).toBeInTheDocument();
   });
 
   it('exposes every main section in the desktop sidebar', async () => {
     renderApp('/');
-    await screen.findByRole('heading', { name: /Bienvenue/ });
+    await screen.findByRole('heading', { name: /Bonjour/ });
     const [sidebar] = screen.getAllByRole('navigation', { name: 'Navigation principale' });
     for (const label of [
       'Dashboard',
@@ -44,7 +31,7 @@ describe('App navigation', () => {
   it('navigates between pages and marks the active link', async () => {
     const user = userEvent.setup();
     renderApp('/');
-    await screen.findByRole('heading', { name: /Bienvenue/ });
+    await screen.findByRole('heading', { name: /Bonjour/ });
 
     const [sidebar] = screen.getAllByRole('navigation', { name: 'Navigation principale' });
     await user.click(within(sidebar).getByRole('link', { name: 'Paramètres' }));

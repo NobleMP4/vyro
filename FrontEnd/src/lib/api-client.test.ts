@@ -1,11 +1,13 @@
 import { vi } from 'vitest';
-import { jsonResponse } from '@/test/render';
+import { apiError, json, mockApi } from '@/test/api-mock';
+import { authResponse } from '@/test/fixtures';
 import { apiRequest } from './api-client';
 import { ApiError } from './api-error';
+import { getAccessToken, onSessionExpired, setSession } from './auth-session';
 
 describe('apiRequest', () => {
   it('calls the configured API URL and returns the JSON body', async () => {
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(jsonResponse({ ok: true }));
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(json({ ok: true }));
 
     await expect(
       apiRequest('/health', { query: { period: '7d', skip: undefined } }),
@@ -30,12 +32,7 @@ describe('apiRequest', () => {
   });
 
   it('throws an ApiError carrying the API error code', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(
-        { statusCode: 400, code: 'INVALID_WEIGHT', message: 'Le poids fourni est invalide.' },
-        400,
-      ),
-    );
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(apiError(400, 'INVALID_WEIGHT'));
 
     const error = await apiRequest('/weight').catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ApiError);
@@ -44,13 +41,72 @@ describe('apiRequest', () => {
 
   it('falls back to an HTTP_<status> code for non-standard error bodies', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('Bad gateway', { status: 502 }));
-
     await expect(apiRequest('/health')).rejects.toMatchObject({ status: 502, code: 'HTTP_502' });
   });
 
   it('turns network failures into NETWORK_ERROR', async () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
-
     await expect(apiRequest('/health')).rejects.toMatchObject({ status: 0, code: 'NETWORK_ERROR' });
+  });
+});
+
+describe('apiRequest authentication', () => {
+  it('sends the access token as a Bearer header', async () => {
+    setSession(authResponse(undefined, 'token-A'));
+    const { callsTo } = mockApi({ 'GET /users/me': () => json({}) });
+
+    await apiRequest('/users/me');
+    expect(callsTo('GET /users/me')[0].headers).toMatchObject({ Authorization: 'Bearer token-A' });
+  });
+
+  it('refreshes an expired token once and retries the request', async () => {
+    setSession(authResponse(undefined, 'expired'));
+    const { callsTo } = mockApi({
+      'GET /users/me': ({ headers }) =>
+        headers.Authorization === 'Bearer fresh'
+          ? json({ ok: true })
+          : apiError(401, 'TOKEN_EXPIRED'),
+      'POST /auth/refresh': () => json(authResponse(undefined, 'fresh')),
+    });
+
+    await expect(apiRequest('/users/me')).resolves.toEqual({ ok: true });
+    expect(callsTo('POST /auth/refresh')).toHaveLength(1);
+    expect(callsTo('POST /auth/refresh')[0].headers).toMatchObject({ 'X-VYRO-Client': 'web' });
+    expect(getAccessToken()).toBe('fresh');
+  });
+
+  it('refreshes only once for concurrent requests', async () => {
+    setSession(authResponse(undefined, 'expired'));
+    const { callsTo } = mockApi({
+      'GET /a': ({ headers }) =>
+        headers.Authorization === 'Bearer fresh' ? json(1) : apiError(401, 'TOKEN_EXPIRED'),
+      'GET /b': ({ headers }) =>
+        headers.Authorization === 'Bearer fresh' ? json(2) : apiError(401, 'TOKEN_EXPIRED'),
+      'POST /auth/refresh': () => json(authResponse(undefined, 'fresh')),
+    });
+
+    await expect(Promise.all([apiRequest('/a'), apiRequest('/b')])).resolves.toEqual([1, 2]);
+    expect(callsTo('POST /auth/refresh')).toHaveLength(1);
+  });
+
+  it('ends the session when the refresh fails', async () => {
+    setSession(authResponse(undefined, 'expired'));
+    const expired = vi.fn();
+    const unsubscribe = onSessionExpired(expired);
+    mockApi({
+      'GET /users/me': () => apiError(401, 'TOKEN_EXPIRED'),
+      'POST /auth/refresh': () => apiError(401, 'INVALID_REFRESH_TOKEN'),
+    });
+
+    await expect(apiRequest('/users/me')).rejects.toMatchObject({ code: 'TOKEN_EXPIRED' });
+    expect(expired).toHaveBeenCalledTimes(1);
+    expect(getAccessToken()).toBeNull();
+    unsubscribe();
+  });
+
+  it('does not try to refresh on other errors', async () => {
+    const { callsTo } = mockApi({ 'GET /users/me': () => apiError(403, 'FORBIDDEN') });
+    await expect(apiRequest('/users/me')).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    expect(callsTo('POST /auth/refresh')).toHaveLength(0);
   });
 });

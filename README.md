@@ -5,9 +5,9 @@
 VYRO est une plateforme sportive personnelle : entraînements, activités, poids, objectifs, records,
 statistiques et progression, réunis dans une PWA moderne, mobile-first et installable.
 
-> **Statut : Phase 1 — Foundation terminée.** L'architecture, le design system, la navigation,
-> l'API, la base de données et l'outillage sont en place. Les fonctionnalités métier
-> (authentification, entraînements, poids…) arrivent phase par phase — voir [`docs/roadmap.md`](docs/roadmap.md).
+> **Statut : Phase 2 — Authentification terminée.** Comptes, sessions sécurisées, onboarding,
+> profil et paramètres de compte fonctionnent de bout en bout. Les fonctionnalités sportives
+> (entraînements, poids…) arrivent phase par phase — voir [`docs/roadmap.md`](docs/roadmap.md).
 
 ---
 
@@ -77,7 +77,7 @@ GRANT CREATE, DROP ON *.* TO 'vyro'@'%';
 
 ```bash
 cd BackEnd
-cp .env.example .env        # renseigne DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+cp .env.example .env        # renseigne DB_* et génère JWT_SECRET / JWT_REFRESH_SECRET (voir ci-dessous)
 npm install                 # génère aussi le client Prisma
 npx prisma migrate dev      # applique les migrations
 npm run prisma:seed         # catalogue d'exercices (idempotent)
@@ -110,7 +110,10 @@ Application : <http://localhost:5173>
 |                           | `DB_PORT`            | Port MySQL (3306 par défaut)                          |
 |                           | `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Identifiants et base (le mot de passe peut contenir des caractères spéciaux) |
 |                           | `DATABASE_URL`       | Optionnel : URL complète, prioritaire sur `DB_*` (hébergeurs managés) |
-|                           | `JWT_SECRET`, `JWT_REFRESH_SECRET` | ≥ 32 caractères, **obligatoires en production** |
+|                           | `JWT_SECRET`, `JWT_REFRESH_SECRET` | **Obligatoires**, ≥ 32 caractères, différents : `openssl rand -base64 48` |
+|                           | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE`, `MAIL_FROM` | Envoi des emails (mot de passe oublié). Sans `SMTP_HOST`, le lien est affiché dans les logs de l'API (dev) |
+|                           | `AUTH_RATE_LIMIT`    | Tentatives / minute / IP sur connexion, inscription… (10 par défaut) |
+|                           | `TRUST_PROXY`        | `true` derrière un reverse proxy (IP réelle pour le rate limiting) |
 |                           | `PORT`               | Port de l'API (3000)                                  |
 |                           | `FRONTEND_URL`       | Origines CORS autorisées (séparées par des virgules)  |
 |                           | `SWAGGER_ENABLED`    | Force l'activation de Swagger (désactivé en prod par défaut) |
@@ -140,11 +143,16 @@ Le seed ne crée **jamais** de données utilisateur : uniquement des données de
 npm run lint && npm run typecheck
 npm test            # tests unitaires
 npm run test:e2e    # pipeline HTTP complet (base mockée, sans MySQL)
+npm run test:int    # intégration sur une vraie base MySQL de test (voir ci-dessous)
 
 # FrontEnd
 npm run lint
 npm test
 ```
+
+Les tests d'intégration utilisent une base dédiée dont le nom **doit finir par `_test`**
+(par défaut `vyro_test` avec les mêmes `DB_*`, ou `TEST_DATABASE_URL`). Les migrations y sont
+appliquées automatiquement ; l'utilisateur MySQL doit pouvoir créer cette base.
 
 La CI GitHub Actions (`.github/workflows/ci.yml`) exécute lint, format, types, tests et build
 pour les deux applications.
@@ -172,6 +180,8 @@ Le FrontEnd et le BackEnd se déploient séparément, sans dépendance à un fou
 
 - Image Docker fournie : `BackEnd/Dockerfile` (applique `prisma migrate deploy` au démarrage)
 - Ou sans Docker : `npm ci && npm run build && npm run prisma:deploy && npm run start:prod`
+- Le refresh token est un cookie `httpOnly` : en production il est `Secure` + `SameSite=None`,
+  l'API doit donc être servie en **HTTPS** et `FRONTEND_URL` doit contenir l'origine exacte du FrontEnd
 - Variables : `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (ou `DATABASE_URL`), `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`
 - Sonde de santé : `GET /api/v1/health` (503 si la base est indisponible)
 

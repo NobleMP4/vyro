@@ -1,11 +1,14 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, LogOut } from 'lucide-react';
 import { Link } from 'react-router';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
 import { mobileSecondaryItems } from '@/components/navigation/nav-items';
 
 /** Mobile « Plus » menu: every section not in the bottom bar. */
 export default function MorePage() {
+  const { logout } = useAuth();
   return (
     <>
       <PageHeader title="Plus" />
@@ -27,6 +30,10 @@ export default function MorePage() {
           </ul>
         </nav>
       </Card>
+      <Button variant="outline" size="lg" className="mt-6 w-full" onClick={() => void logout()}>
+        <LogOut aria-hidden="true" />
+        Se déconnecter
+      </Button>
     </>
   );
 }
