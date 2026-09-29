@@ -77,7 +77,8 @@ GRANT CREATE, DROP ON *.* TO 'vyro'@'%';
 
 ```bash
 cd BackEnd
-cp .env.example .env        # renseigne DB_* et génère JWT_SECRET / JWT_REFRESH_SECRET (voir ci-dessous)
+cp .env.example .env        # puis renseigne DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+npm run setup:env           # génère JWT_SECRET et JWT_REFRESH_SECRET dans .env
 npm install                 # génère aussi le client Prisma
 npx prisma migrate dev      # applique les migrations
 npm run prisma:seed         # catalogue d'exercices (idempotent)

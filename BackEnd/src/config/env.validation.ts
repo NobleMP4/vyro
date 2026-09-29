@@ -124,7 +124,10 @@ export function validateEnv(config: Record<string, unknown>): EnvironmentVariabl
     const details = errors
       .map((error) => `  - ${error.property}: ${Object.values(error.constraints ?? {}).join(', ')}`)
       .join('\n');
-    throw new Error(`Invalid environment configuration:\n${details}`);
+    const hint = errors.some((e) => e.property.startsWith('JWT_'))
+      ? '\n\nRun `npm run setup:env` in BackEnd/ to generate the JWT secrets in .env.'
+      : '';
+    throw new Error(`Invalid environment configuration:\n${details}${hint}`);
   }
   return env;
 }
