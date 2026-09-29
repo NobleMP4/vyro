@@ -5,61 +5,62 @@
 
 /*
  * VYRO design tokens.
- * Brand accent "Volt" — an electric lime used sparingly: primary actions,
- * active navigation, key numbers. Everything else stays neutral.
+ * Brand accent "VYRO Blue", taken from the logo (#005AFC). Used sparingly:
+ * primary actions, active navigation, key numbers. Everything else stays neutral.
  */
 :root {
-  --background: #f5f6f3;
-  --foreground: #0b0d0e;
+  --background: #f5f6f8;
+  --foreground: #0a0c10;
   --card: #ffffff;
-  --card-foreground: #0b0d0e;
-  --muted: #eceee9;
-  --muted-foreground: #5c635d;
-  --border: #e0e3dc;
-  --input: #d6dad2;
-  --ring: #7fa600;
+  --card-foreground: #0a0c10;
+  --muted: #eceef2;
+  --muted-foreground: #5b6270;
+  --border: #e1e4ea;
+  --input: #d5d9e0;
+  --ring: #005afc;
 
-  --primary: #c6f135;
-  --primary-foreground: #0b0d0e;
-  /* Brand color for text/icons on light surfaces (volt is too light for text). */
-  --brand: #4a6800;
+  --primary: #005afc;
+  --primary-foreground: #ffffff;
+  /* Brand color for text/icons on the page background. */
+  --brand: #004fdc;
 
-  --secondary: #0b0d0e;
-  --secondary-foreground: #f5f6f3;
+  --secondary: #0a0c10;
+  --secondary-foreground: #f5f6f8;
 
   --destructive: #d93d42;
   --destructive-foreground: #ffffff;
   --success: #1f9d5c;
   --warning: #c98512;
-  --info: #3269e6;
+  --info: #0e8fb3;
 
   --radius: 1rem;
-  --shadow-card: 0 1px 2px rgb(11 13 14 / 0.04), 0 4px 16px rgb(11 13 14 / 0.04);
+  --shadow-card: 0 1px 2px rgb(10 12 16 / 0.04), 0 4px 16px rgb(10 12 16 / 0.04);
 }
 
 .dark {
-  --background: #0a0b0c;
-  --foreground: #f1f3ef;
-  --card: #131517;
-  --card-foreground: #f1f3ef;
-  --muted: #1b1e21;
-  --muted-foreground: #939a9f;
-  --border: #23272b;
-  --input: #2d3237;
-  --ring: #cbff3d;
+  --background: #0a0b0d;
+  --foreground: #f1f3f7;
+  --card: #131519;
+  --card-foreground: #f1f3f7;
+  --muted: #1b1e24;
+  --muted-foreground: #939aa6;
+  --border: #23272e;
+  --input: #2d323a;
+  --ring: #3d85ff;
 
-  --primary: #cbff3d;
-  --primary-foreground: #0a0b0c;
-  --brand: #cbff3d;
+  /* Slightly brighter than the logo so it holds up on near-black. */
+  --primary: #1f6fff;
+  --primary-foreground: #ffffff;
+  --brand: #5e9bff;
 
-  --secondary: #f1f3ef;
-  --secondary-foreground: #0a0b0c;
+  --secondary: #f1f3f7;
+  --secondary-foreground: #0a0b0d;
 
   --destructive: #f2555a;
-  --destructive-foreground: #0a0b0c;
+  --destructive-foreground: #0a0b0d;
   --success: #3ccf85;
   --warning: #f0b547;
-  --info: #6b95ff;
+  --info: #3cc3e6;
 
   --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset;
 }

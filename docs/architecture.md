@@ -133,7 +133,10 @@ Composant → hook (useQuery/useMutation) → service → apiRequest() → fetch
 ### Design system
 
 - Tokens CSS dans `src/index.css` (clair / sombre), exposés à Tailwind via `@theme`.
-- Accent de marque **Volt** (`--primary`) utilisé avec parcimonie ; `--brand` pour le texte d'accent.
+- Accent de marque **VYRO Blue** (`--primary`, `#005AFC`, issu du logo) utilisé avec parcimonie ; `--brand` pour le texte d'accent.
+- Logo : sources haute résolution dans `FrontEnd/src/assets/brand/` (`vyro-transparent.png`, `vyro-fond-noir.png`).
+  L'application n'embarque que des déclinaisons optimisées : `vyro-mark.webp` (256 px), `public/favicon.png`,
+  `public/apple-touch-icon.png`. Les icônes PWA (192/512, maskable) seront générées en Phase 14.
 - Typographies : Inter (texte), Space Grotesk (titres, logo) — auto-hébergées pour le hors-ligne.
 - Thème clair / sombre / système, appliqué avant le premier rendu (pas de flash).
 - Mobile-first : bottom navigation avec grandes cibles tactiles et safe areas, sidebar à partir de `lg`.

@@ -14,7 +14,7 @@ import {
 } from './theme-context';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
-const THEME_COLORS: Record<ResolvedTheme, string> = { light: '#f5f6f3', dark: '#0a0b0c' };
+const THEME_COLORS: Record<ResolvedTheme, string> = { light: '#f5f6f8', dark: '#0a0b0d' };
 
 function readPreference(): ThemePreference {
   try {
