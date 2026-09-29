@@ -1,7 +1,7 @@
 // VYRO — Prisma schema
 //
-// Phase 1 (Foundation) only models what the next phases build on directly:
-// accounts, profiles, refresh tokens and the exercise catalog.
+// Models are added phase by phase, each through its own migration:
+// accounts & auth (Phases 1–2), exercise catalog (Phase 1, used from Phase 5).
 // Workouts, activities, weight, goals, records… are added in their own phases
 // through dedicated migrations. See docs/architecture.md.
 
@@ -30,14 +30,13 @@ model User {
   role         UserRole  @default(USER)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  /// Soft delete: the account is anonymised then purged asynchronously.
-  deletedAt    DateTime?
+  lastLoginAt  DateTime?
 
-  profile       Profile?
-  refreshTokens RefreshToken[]
-  exercises     Exercise[]
-
-  @@index([deletedAt])
+  // Deleting a user deletes all of their data (cascade): no soft delete for accounts.
+  profile             Profile?
+  refreshTokens       RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  exercises           Exercise[]
 }
 
 enum WeightUnit {
@@ -61,6 +60,31 @@ enum ThemePreference {
   SYSTEM
 }
 
+enum MainGoal {
+  LOSE_WEIGHT
+  BUILD_MUSCLE
+  GET_STRONGER
+  IMPROVE_ENDURANCE
+  STAY_ACTIVE
+}
+
+/// Sports supported by VYRO. Reused by activities (Phase 8).
+enum ActivityType {
+  RUNNING
+  WALKING
+  CYCLING
+  SWIMMING
+  STRENGTH
+  FOOTBALL
+  BASKETBALL
+  BOXING
+  HIKING
+  CLIMBING
+  YOGA
+  HIIT
+  OTHER
+}
+
 model Profile {
   id                  String          @id @default(cuid())
   userId              String          @unique
@@ -73,6 +97,11 @@ model Profile {
   heightUnit          HeightUnit      @default(CM)
   theme               ThemePreference @default(SYSTEM)
   gamificationEnabled Boolean         @default(true)
+  mainGoal            MainGoal?
+  /// Target number of workouts per week (1–14).
+  weeklyWorkoutTarget Int?            @db.TinyInt
+  /// JSON array of ActivityType values chosen at onboarding.
+  favoriteActivities  Json?
   onboardingCompleted Boolean         @default(false)
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
@@ -83,7 +112,7 @@ model Profile {
 model RefreshToken {
   id        String    @id @default(cuid())
   userId    String
-  /// SHA-256 of the token — the raw token is never stored.
+  /// HMAC-SHA256 of the token (keyed with JWT_REFRESH_SECRET) — the raw token is never stored.
   tokenHash String    @unique @db.Char(64)
   /// Tokens issued by rotation share a family, so reuse of a revoked token
   /// can revoke the whole chain.
@@ -98,6 +127,20 @@ model RefreshToken {
   @@index([userId])
   @@index([family])
   @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  /// HMAC-SHA256 of the token sent by email.
+  tokenHash String    @unique @db.Char(64)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -148,25 +191,25 @@ enum ExerciseTrackingType {
 }
 
 model Exercise {
-  id           String               @id @default(cuid())
+  id               String               @id @default(cuid())
   /// Stable key for catalog exercises (seed upserts on it). Null for custom ones.
-  slug         String?              @unique @db.VarChar(100)
-  name         String               @db.VarChar(100)
-  description  String?              @db.Text
-  instructions String?              @db.Text
-  tips         String?              @db.Text
-  muscleGroup  MuscleGroup
+  slug             String?              @unique @db.VarChar(100)
+  name             String               @db.VarChar(100)
+  description      String?              @db.Text
+  instructions     String?              @db.Text
+  tips             String?              @db.Text
+  muscleGroup      MuscleGroup
   /// Secondary muscles, stored as a JSON array of MuscleGroup values.
   secondaryMuscles Json?
-  equipment    Equipment
-  difficulty   Difficulty           @default(BEGINNER)
-  trackingType ExerciseTrackingType @default(WEIGHT_REPS)
-  mediaUrl     String?              @db.VarChar(500)
+  equipment        Equipment
+  difficulty       Difficulty           @default(BEGINNER)
+  trackingType     ExerciseTrackingType @default(WEIGHT_REPS)
+  mediaUrl         String?              @db.VarChar(500)
   /// Null = catalog exercise shared by everyone; set = user's custom exercise.
-  ownerId      String?
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  deletedAt    DateTime?
+  ownerId          String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  deletedAt        DateTime?
 
   owner User? @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 

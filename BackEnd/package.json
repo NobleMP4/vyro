@@ -1,7 +1,7 @@
 {
   "name": "vyro-backend",
   "version": "0.1.0",
-  "description": "VYRO REST API — NestJS + Prisma + MySQL",
+  "description": "VYRO REST API \u2014 NestJS + Prisma + MySQL",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
@@ -27,7 +27,8 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:int": "jest --config ./test/jest-int.json --runInBand"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -52,12 +53,17 @@
     "@nestjs/common": "^11.2.6",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.2.6",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.2.6",
     "@nestjs/swagger": "^11.4.7",
+    "@nestjs/throttler": "^6.7.1",
     "@prisma/client": "^6.19.3",
+    "argon2": "^0.45.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "cookie-parser": "^1.4.7",
     "helmet": "^8.3.0",
+    "nodemailer": "^10.0.12",
     "prisma": "^6.19.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
@@ -67,9 +73,11 @@
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.2.6",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.20.4",
+    "@types/nodemailer": "^8.0.2",
     "@types/supertest": "^7.2.1",
     "dotenv": "^18.0.4",
     "eslint": "^9.39.5",

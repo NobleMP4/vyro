@@ -10,7 +10,6 @@ import {
   Max,
   Min,
   MinLength,
-  ValidateIf,
   validateSync,
 } from 'class-validator';
 
@@ -19,8 +18,6 @@ export enum NodeEnv {
   Production = 'production',
   Test = 'test',
 }
-
-const isProduction = (env: EnvironmentVariables): boolean => env.NODE_ENV === NodeEnv.Production;
 
 /**
  * Every variable the API reads. The process refuses to start when the
@@ -48,16 +45,61 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   FRONTEND_URL = 'http://localhost:5173';
 
-  // JWT secrets are consumed from Phase 2 (auth). They are mandatory in production.
-  @ValidateIf((env: EnvironmentVariables) => isProduction(env) || !!env.JWT_SECRET)
+  /** Signs access tokens (JWT). */
   @IsString()
-  @MinLength(32)
-  JWT_SECRET?: string;
+  @MinLength(32, { message: 'JWT_SECRET must be at least 32 characters (openssl rand -base64 48)' })
+  JWT_SECRET: string;
 
-  @ValidateIf((env: EnvironmentVariables) => isProduction(env) || !!env.JWT_REFRESH_SECRET)
+  /** Keys the HMAC of refresh and password-reset tokens stored in the database. */
   @IsString()
-  @MinLength(32)
-  JWT_REFRESH_SECRET?: string;
+  @MinLength(32, {
+    message: 'JWT_REFRESH_SECRET must be at least 32 characters (openssl rand -base64 48)',
+  })
+  JWT_REFRESH_SECRET: string;
+
+  /** Max attempts per minute and per IP on sensitive auth routes (login, register…). */
+  @Transform(({ value }: { value: unknown }) => (value === undefined ? value : Number(value)))
+  @IsInt()
+  @Min(1)
+  AUTH_RATE_LIMIT = 10;
+
+  /** Set to true behind a reverse proxy so rate limiting sees the real client IP. */
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value === 'true' : value,
+  )
+  @IsBoolean()
+  TRUST_PROXY?: boolean;
+
+  // ── Email (password reset). Without SMTP_HOST, emails are only logged. ──
+  @IsOptional()
+  @IsString()
+  SMTP_HOST?: string;
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => (value === undefined ? value : Number(value)))
+  @IsInt()
+  @Min(1)
+  @Max(65535)
+  SMTP_PORT?: number;
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value === 'true' : value,
+  )
+  @IsBoolean()
+  SMTP_SECURE?: boolean;
+
+  @IsOptional()
+  @IsString()
+  SMTP_USER?: string;
+
+  @IsOptional()
+  @IsString()
+  SMTP_PASSWORD?: string;
+
+  @IsString()
+  MAIL_FROM = 'VYRO <no-reply@localhost>';
 
   /** Swagger is on by default outside production. */
   @IsOptional()

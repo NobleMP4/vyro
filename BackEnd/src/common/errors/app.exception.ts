@@ -15,4 +15,10 @@ export class AppException extends HttpException {
     const body: AppExceptionBody = { code, message, ...(details !== undefined && { details }) };
     super(body, status);
   }
+
+  /** True when `error` is an AppException carrying `code`. */
+  static hasCode(error: unknown, code: string): boolean {
+    if (!(error instanceof AppException)) return false;
+    return (error.getResponse() as AppExceptionBody).code === code;
+  }
 }
