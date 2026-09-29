@@ -27,6 +27,11 @@ export const ErrorCode = {
   /** Wrong current password when changing password / deleting the account. */
   INVALID_PASSWORD: 'INVALID_PASSWORD',
   UNTRUSTED_CLIENT: 'UNTRUSTED_CLIENT',
+
+  // Exercises
+  EXERCISE_NOT_FOUND: 'EXERCISE_NOT_FOUND',
+  /** Catalog exercises are shared and read-only. */
+  EXERCISE_NOT_EDITABLE: 'EXERCISE_NOT_EDITABLE',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
