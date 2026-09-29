@@ -17,8 +17,18 @@ describe('validateEnv', () => {
     expect(env.SWAGGER_ENABLED).toBe(false);
   });
 
+  it('builds DATABASE_URL from DB_* variables', () => {
+    const env = validateEnv({
+      DB_HOST: '10.0.0.5',
+      DB_USER: 'vyro',
+      DB_PASSWORD: 'x',
+      DB_NAME: 'vyro',
+    });
+    expect(env.DATABASE_URL).toBe('mysql://vyro:x@10.0.0.5:3306/vyro');
+  });
+
   it('rejects a missing DATABASE_URL', () => {
-    expect(() => validateEnv({})).toThrow(/DATABASE_URL/);
+    expect(() => validateEnv({})).toThrow(/DB_HOST/);
   });
 
   it('requires strong JWT secrets in production', () => {

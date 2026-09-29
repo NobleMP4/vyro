@@ -1,4 +1,5 @@
 import { plainToInstance, Transform } from 'class-transformer';
+import { resolveDatabaseUrl } from './database-url';
 import {
   IsBoolean,
   IsEnum,
@@ -35,8 +36,11 @@ export class EnvironmentVariables {
   @Max(65535)
   PORT = 3000;
 
-  @IsString()
-  @IsNotEmpty()
+  /**
+   * Built from DB_HOST / DB_PORT / DB_USER / DB_PASSWORD / DB_NAME,
+   * or given directly (see resolveDatabaseUrl).
+   */
+  @IsNotEmpty({ message: 'set DB_HOST, DB_USER and DB_NAME (or a full DATABASE_URL)' })
   DATABASE_URL: string;
 
   /** Comma-separated list of allowed CORS origins. */
@@ -65,10 +69,14 @@ export class EnvironmentVariables {
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {
-  const env = plainToInstance(EnvironmentVariables, config, {
-    enableImplicitConversion: false,
-    exposeDefaultValues: true,
-  });
+  const env = plainToInstance(
+    EnvironmentVariables,
+    { ...config, DATABASE_URL: resolveDatabaseUrl(config as Record<string, string | undefined>) },
+    {
+      enableImplicitConversion: false,
+      exposeDefaultValues: true,
+    },
+  );
   const errors = validateSync(env, { skipMissingProperties: false });
   if (errors.length > 0) {
     const details = errors

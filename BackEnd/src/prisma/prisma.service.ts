@@ -1,9 +1,15 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
+import { EnvironmentVariables } from '../config/env.validation';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
+
+  constructor(config: ConfigService<EnvironmentVariables, true>) {
+    super({ datasourceUrl: config.get('DATABASE_URL', { infer: true }) });
+  }
 
   async onModuleInit(): Promise<void> {
     // Don't crash the API when MySQL is not up yet: Prisma reconnects lazily

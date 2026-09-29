@@ -52,16 +52,32 @@ seront ajoutées avec les phases qui les utilisent.
 
 ### 1. Base de données (MySQL)
 
+**Option A — conteneur fourni**
+
 ```bash
-cp .env.example .env        # optionnel : identifiants MySQL locaux
+cp .env.example .env        # optionnel : identifiants / port MySQL (MYSQL_PORT si 3306 est déjà pris)
 docker compose up -d
+```
+
+**Option B — MySQL déjà existant** (autre conteneur Docker, serveur, NAS…)
+
+Pas besoin de `docker compose`. Crée la base et un utilisateur, puis renseigne son adresse dans
+`BackEnd/.env` (étape suivante) :
+
+```sql
+CREATE DATABASE vyro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'vyro'@'%' IDENTIFIED BY 'mot-de-passe';
+GRANT ALL PRIVILEGES ON vyro.* TO 'vyro'@'%';
+-- `prisma migrate dev` crée une base temporaire (shadow database) : en développement,
+-- l'utilisateur a aussi besoin du droit de créer des bases.
+GRANT CREATE, DROP ON *.* TO 'vyro'@'%';
 ```
 
 ### 2. BackEnd
 
 ```bash
 cd BackEnd
-cp .env.example .env
+cp .env.example .env        # renseigne DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 npm install                 # génère aussi le client Prisma
 npx prisma migrate dev      # applique les migrations
 npm run prisma:seed         # catalogue d'exercices (idempotent)
@@ -90,7 +106,10 @@ Application : <http://localhost:5173>
 | Fichier                   | Variable             | Rôle                                                  |
 | ------------------------- | -------------------- | ----------------------------------------------------- |
 | `.env`                    | `MYSQL_*`            | Identifiants du conteneur MySQL local                 |
-| `BackEnd/.env`            | `DATABASE_URL`       | Connexion MySQL (Prisma)                              |
+| `BackEnd/.env`            | `DB_HOST`            | Adresse du serveur MySQL (`localhost`, IP, ou nom du conteneur) |
+|                           | `DB_PORT`            | Port MySQL (3306 par défaut)                          |
+|                           | `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Identifiants et base (le mot de passe peut contenir des caractères spéciaux) |
+|                           | `DATABASE_URL`       | Optionnel : URL complète, prioritaire sur `DB_*` (hébergeurs managés) |
 |                           | `JWT_SECRET`, `JWT_REFRESH_SECRET` | ≥ 32 caractères, **obligatoires en production** |
 |                           | `PORT`               | Port de l'API (3000)                                  |
 |                           | `FRONTEND_URL`       | Origines CORS autorisées (séparées par des virgules)  |
@@ -153,7 +172,7 @@ Le FrontEnd et le BackEnd se déploient séparément, sans dépendance à un fou
 
 - Image Docker fournie : `BackEnd/Dockerfile` (applique `prisma migrate deploy` au démarrage)
 - Ou sans Docker : `npm ci && npm run build && npm run prisma:deploy && npm run start:prod`
-- Variables : `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`
+- Variables : `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (ou `DATABASE_URL`), `JWT_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`
 - Sonde de santé : `GET /api/v1/health` (503 si la base est indisponible)
 
 **Base de données** — tout MySQL 8 compatible (managé ou VPS).

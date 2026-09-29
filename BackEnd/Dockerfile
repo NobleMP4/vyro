@@ -5,6 +5,8 @@ WORKDIR /app
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
 COPY package*.json prisma.config.ts ./
 COPY prisma ./prisma
+# prisma.config.ts (loaded by `prisma generate` on install) imports this helper.
+COPY src/config/database-url.ts ./src/config/
 RUN npm ci
 COPY . .
 RUN npm run build && npm prune --omit=dev
@@ -19,4 +21,5 @@ COPY --from=build /app/prisma ./prisma
 COPY package.json ./
 USER node
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy --schema prisma/schema.prisma && node dist/main"]
+# DATABASE_URL is derived from DB_* variables when not provided directly.
+CMD ["sh", "-c", "export DATABASE_URL=\"$(node -p \"require('./dist/config/database-url').resolveDatabaseUrl() ?? ''\")\" && npx prisma migrate deploy --schema prisma/schema.prisma && node dist/main"]
