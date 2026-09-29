@@ -34,6 +34,9 @@ export class ProfileResponseDto {
   @ApiProperty({ enum: ThemePreference })
   theme: ThemePreference;
 
+  @ApiProperty({ example: 'Europe/Paris' })
+  timezone: string;
+
   @ApiProperty()
   gamificationEnabled: boolean;
 

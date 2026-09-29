@@ -6,7 +6,9 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  IsTimeZone,
   Max,
   MaxLength,
   Min,
@@ -44,4 +46,9 @@ export class CompleteOnboardingDto {
 
   @IsEnum(HeightUnit)
   heightUnit: HeightUnit;
+
+  /** IANA time zone of the device, e.g. Europe/Paris */
+  @IsOptional()
+  @IsTimeZone()
+  timezone?: string;
 }

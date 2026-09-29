@@ -22,6 +22,7 @@ function toProfile(profile: Profile): ProfileResponseDto {
     distanceUnit: profile.distanceUnit,
     heightUnit: profile.heightUnit,
     theme: profile.theme,
+    timezone: profile.timezone,
     gamificationEnabled: profile.gamificationEnabled,
     mainGoal: profile.mainGoal,
     weeklyWorkoutTarget: profile.weeklyWorkoutTarget,

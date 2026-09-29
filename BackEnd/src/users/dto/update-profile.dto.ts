@@ -18,6 +18,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsTimeZone,
   Max,
   MaxLength,
   Min,
@@ -69,6 +70,11 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsBoolean()
   gamificationEnabled?: boolean;
+
+  /** IANA time zone, e.g. Europe/Paris */
+  @IsOptional()
+  @IsTimeZone()
+  timezone?: string;
 
   @IsOptional()
   @ValidateIf((_o, value) => value !== null)

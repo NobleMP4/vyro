@@ -96,6 +96,8 @@ model Profile {
   distanceUnit        DistanceUnit    @default(KM)
   heightUnit          HeightUnit      @default(CM)
   theme               ThemePreference @default(SYSTEM)
+  /// IANA time zone (e.g. Europe/Paris): defines "today", weeks and streaks.
+  timezone            String          @default("Europe/Paris") @db.VarChar(64)
   gamificationEnabled Boolean         @default(true)
   mainGoal            MainGoal?
   /// Target number of workouts per week (1–14).

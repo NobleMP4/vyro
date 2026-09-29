@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlingModule } from './common/throttling/throttling.module';
 import { validateEnv } from './config/env.validation';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -17,6 +18,7 @@ import { UsersModule } from './users/users.module';
     ThrottlingModule,
     AuthModule,
     UsersModule,
+    DashboardModule,
     HealthModule,
   ],
 })
