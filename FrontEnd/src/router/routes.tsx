@@ -59,6 +59,14 @@ export const appRoutes: RouteObject[] = [
                     lazy: page(() => import('@/pages/dashboard/DashboardPage')),
                   },
                   { path: paths.workouts, lazy: page(() => import('@/pages/WorkoutsPage')) },
+                  {
+                    path: paths.exercises,
+                    lazy: page(() => import('@/pages/exercises/ExercisesPage')),
+                  },
+                  {
+                    path: `${paths.exercises}/:id`,
+                    lazy: page(() => import('@/pages/exercises/ExerciseDetailPage')),
+                  },
                   { path: paths.activities, lazy: page(() => import('@/pages/ActivitiesPage')) },
                   { path: paths.progress, lazy: page(() => import('@/pages/ProgressPage')) },
                   { path: paths.goals, lazy: page(() => import('@/pages/GoalsPage')) },

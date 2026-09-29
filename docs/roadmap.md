@@ -9,8 +9,8 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 | 2  | Authentification           | ✅ Terminée |
 | 3  | Design System (complément) | ✅ Terminée |
 | 4  | Dashboard                  | ✅ Terminée |
-| 5  | Exercices                  | ⏭️ Suivante |
-| 6  | Entraînements              | À faire     |
+| 5  | Exercices                  | ✅ Terminée |
+| 6  | Entraînements              | ⏭️ Suivante |
 | 7  | Poids                      | À faire     |
 | 8  | Activités                  | À faire     |
 | 9  | Records                    | À faire     |
@@ -79,8 +79,21 @@ connexion via fournisseurs tiers, notifications.
 Chaque phase suivante remplace le statut `UNAVAILABLE` de sa section par un vrai calcul :
 activité de la semaine et série (Phase 6), poids (Phase 7), records (Phase 9).
 
-## Phase 5 — Exercices (prochaine)
+## Phase 5 — Exercices ✅
 
-- API catalogue : liste paginée, recherche, filtres (groupe musculaire, équipement,
-  difficulté), détail ; exercices personnalisés de l'utilisateur
-- Bibliothèque FrontEnd : recherche, filtres, fiches détaillées
+- [x] API : recherche (insensible à la casse et aux accents), filtres groupe musculaire /
+      équipement / difficulté / source (tous, catalogue, perso), pagination, détail
+- [x] Exercices personnalisés : création, modification, suppression (douce, pour conserver
+      l'historique des séances) ; le catalogue est en lecture seule ; les exercices des autres
+      utilisateurs sont invisibles (404)
+- [x] Catalogue de 40 exercices couvrant tous les groupes musculaires (seed idempotent)
+- [x] Bibliothèque FrontEnd : recherche instantanée, filtres conservés dans l'URL,
+      « Afficher plus », fiche détaillée (exécution, conseils, muscles, type de suivi)
+- [x] Accessible depuis l'onglet Entraînements (qui reste actif dans la navigation)
+- [x] Tests : intégration (MySQL) et FrontEnd
+
+## Phase 6 — Entraînements (prochaine)
+
+- Séances : création, modification, duplication, planification, exercices et séries
+- Mode séance : série en cours, validation, repos chronométré, pause, notes, fin de séance
+- Historique ; alimente le dashboard (activité de la semaine, série)

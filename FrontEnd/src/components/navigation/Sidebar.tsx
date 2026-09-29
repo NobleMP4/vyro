@@ -1,34 +1,30 @@
 import { LogOut } from 'lucide-react';
-import { NavLink } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { Logo } from '@/components/brand/Logo';
 import { UserAvatar } from '@/components/profile/UserAvatar';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { accountNavItems, mainNavItems, type NavItem } from './nav-items';
+import { accountNavItems, isNavItemActive, mainNavItems, type NavItem } from './nav-items';
 
 function SidebarLink({ item }: { item: NavItem }) {
   const Icon = item.icon;
+  const { pathname } = useLocation();
+  const active = isNavItemActive(item, pathname);
   return (
-    <NavLink
+    <Link
       to={item.to}
-      end={item.to === '/'}
-      className={({ isActive }) =>
-        cn(
-          'flex h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors',
-          isActive
-            ? 'bg-muted text-foreground'
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <Icon className={cn('size-[18px]', isActive && 'text-brand')} aria-hidden="true" />
-          {item.label}
-        </>
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'flex h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors',
+        active
+          ? 'bg-muted text-foreground'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
       )}
-    </NavLink>
+    >
+      <Icon className={cn('size-[18px]', active && 'text-brand')} aria-hidden="true" />
+      {item.label}
+    </Link>
   );
 }
 

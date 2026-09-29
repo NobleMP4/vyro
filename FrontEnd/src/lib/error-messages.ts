@@ -25,6 +25,8 @@ const MESSAGES_BY_CODE: Record<string, string> = {
   INVALID_RESET_TOKEN:
     'Ce lien de réinitialisation est invalide ou a expiré. Fais une nouvelle demande.',
   INVALID_PASSWORD: 'Mot de passe actuel incorrect.',
+  EXERCISE_NOT_FOUND: 'Cet exercice n’existe pas ou a été supprimé.',
+  EXERCISE_NOT_EDITABLE: 'Les exercices du catalogue ne peuvent pas être modifiés.',
 };
 
 const FALLBACK = 'Une erreur est survenue. Réessaie.';

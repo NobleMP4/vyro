@@ -2,6 +2,7 @@
 export const paths = {
   dashboard: '/',
   workouts: '/workouts',
+  exercises: '/exercises',
   activities: '/activities',
   progress: '/progress',
   goals: '/goals',
@@ -18,3 +19,5 @@ export const paths = {
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
 } as const;
+
+export const exercisePath = (id: string) => `${paths.exercises}/${id}`;

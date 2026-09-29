@@ -87,6 +87,19 @@ ou `UNAVAILABLE` (fonctionnalité pas encore livrée). Les dates (« aujourd'hui
 lundi → dimanche, séries) sont calculées dans le fuseau `Profile.timezone`
 (`src/common/time/zoned-date.ts`, Intl uniquement).
 
+### Pagination
+
+Les listes acceptent `?page=1&pageSize=20` (max 100) et renvoient
+`{ items, total, page, pageSize, hasMore }` (`src/common/dto/pagination.dto.ts`).
+
+### Exercices
+
+Le catalogue (`ownerId = null`, clé `slug`, alimenté par le seed) est partagé et en lecture
+seule. Chaque utilisateur peut créer ses exercices (`ownerId` = lui), invisibles pour les
+autres (réponse 404, jamais 403, pour ne pas révéler leur existence). Suppression douce
+(`deletedAt`) afin que les séances passées gardent leurs exercices. La recherche repose sur la
+collation MySQL `utf8mb4_unicode_ci` (insensible à la casse et aux accents).
+
 ### Format d'erreur
 
 Toutes les erreurs ont la même forme :

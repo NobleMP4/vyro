@@ -1,5 +1,6 @@
 import { deviceTimeZone } from '@/lib/timezone';
 import type { Dashboard } from '@/types/dashboard';
+import type { Exercise } from '@/types/exercise';
 import type { AuthResponse, User } from '@/types/user';
 
 export function makeUser(
@@ -69,4 +70,26 @@ export function makeDashboard(overrides: Partial<Dashboard> = {}): Dashboard {
     ],
     ...overrides,
   };
+}
+
+export function makeExercise(overrides: Partial<Exercise> = {}): Exercise {
+  return {
+    id: 'ex-bench',
+    name: 'Développé couché',
+    description: 'Exercice polyarticulaire de référence pour les pectoraux.',
+    instructions: 'Descends la barre au milieu de la poitrine puis pousse.',
+    tips: 'Omoplates serrées.',
+    muscleGroup: 'CHEST' as const,
+    secondaryMuscles: ['TRICEPS' as const, 'SHOULDERS' as const],
+    equipment: 'BARBELL' as const,
+    difficulty: 'INTERMEDIATE' as const,
+    trackingType: 'WEIGHT_REPS' as const,
+    mediaUrl: null,
+    isCustom: false,
+    ...overrides,
+  };
+}
+
+export function page<T>(items: T[], { total = items.length, page = 1, pageSize = 24 } = {}) {
+  return { items, total, page, pageSize, hasMore: page * pageSize < total };
 }
