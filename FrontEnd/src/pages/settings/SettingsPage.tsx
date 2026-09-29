@@ -8,6 +8,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { AppearanceSettings } from './AppearanceSettings';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { DeleteAccountDialog } from './DeleteAccountDialog';
+import { PreferencesSettings } from './PreferencesSettings';
 import { UnitsSettings } from './UnitsSettings';
 
 const UPCOMING_SECTIONS = [
@@ -42,6 +43,7 @@ export default function SettingsPage() {
 
         <AppearanceSettings />
         <UnitsSettings />
+        <PreferencesSettings />
 
         <Card className="divide-y overflow-hidden">
           {UPCOMING_SECTIONS.map((section) => (

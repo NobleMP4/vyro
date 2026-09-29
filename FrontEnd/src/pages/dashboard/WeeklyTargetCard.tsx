@@ -27,7 +27,7 @@ export function WeeklyTargetCard() {
       <CardContent className="space-y-4">
         {profile.weeklyWorkoutTarget && (
           <p>
-            <span className="font-display text-3xl font-bold tabular">
+            <span className="text-3xl font-semibold tracking-tight">
               {profile.weeklyWorkoutTarget}
             </span>{' '}
             <span className="text-muted-foreground">

@@ -154,6 +154,9 @@ Composant → hook (useQuery/useMutation) → service → apiRequest() → fetch
 
 ### Design system
 
+Détails et règles d'usage : [`docs/design-system.md`](design-system.md) ; référence vivante
+sur `/design-system` en développement.
+
 - Tokens CSS dans `src/index.css` (clair / sombre), exposés à Tailwind via `@theme`.
 - Accent de marque **VYRO Blue** (`--primary`, `#005AFC`, issu du logo) utilisé avec parcimonie ; `--brand` pour le texte d'accent.
 - Logo : sources haute résolution dans `FrontEnd/src/assets/brand/` (`vyro-transparent.png`, `vyro-fond-noir.png`).

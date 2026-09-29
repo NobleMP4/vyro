@@ -12,6 +12,7 @@ export const paths = {
   settings: '/settings',
   more: '/more',
   onboarding: '/onboarding',
+  designSystem: '/design-system',
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',

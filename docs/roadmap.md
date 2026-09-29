@@ -7,8 +7,8 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 | -- | -------------------------- | ----------- |
 | 1  | Foundation                 | ✅ Terminée |
 | 2  | Authentification           | ✅ Terminée |
-| 3  | Design System (complément) | ⏭️ Suivante |
-| 4  | Dashboard                  | À faire     |
+| 3  | Design System (complément) | ✅ Terminée |
+| 4  | Dashboard                  | ⏭️ Suivante |
 | 5  | Exercices                  | À faire     |
 | 6  | Entraînements              | À faire     |
 | 7  | Poids                      | À faire     |
@@ -51,7 +51,20 @@ données, validation, gestion des erreurs, états UX, tests, responsive et sécu
 Hors périmètre, prévu plus tard : photo de profil (upload), vérification de l'adresse email,
 connexion via fournisseurs tiers, notifications.
 
-## Phase 3 — Design System (prochaine)
+## Phase 3 — Design System ✅
 
-- Compléter les composants partagés (select, textarea, tabs, sheet, tooltip, stat cards…)
-- États de chargement et animations homogènes, documentation des composants
+- [x] Composants : select natif, textarea, switch, onglets, tooltip, spinner, barre de
+      progression, stepper numérique (saisie en séance), dialogue de confirmation
+- [x] Données : stat cards (variation colorée selon le sens souhaité), sélecteur de période,
+      `QueryContent` (chargement / erreur / vide / succès)
+- [x] Graphiques : palette validée (daltonisme, clair et sombre), courbes/aires avec moyenne
+      et objectif, barres, légende, vue tableau accessible, graduations rondes
+- [x] Formats et unités fr-FR (kg/lb, km/mi, durées, allure, variations)
+- [x] Animations discrètes (apparition, décalage en grille, « pop »), respect de `prefers-reduced-motion`
+- [x] Page de référence vivante `/design-system` (dev uniquement) + `docs/design-system.md`
+- [x] Appliqué : réglage gamification (Paramètres), chiffres du dashboard
+
+## Phase 4 — Dashboard (prochaine)
+
+- Structure définitive du dashboard : semaine en cours, progression, objectif, records, série
+- Remplissage au fil des phases suivantes avec les vraies données (aucune donnée fictive)

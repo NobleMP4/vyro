@@ -71,6 +71,15 @@ export const appRoutes: RouteObject[] = [
                     lazy: page(() => import('@/pages/settings/SettingsPage')),
                   },
                   { path: paths.more, lazy: page(() => import('@/pages/MorePage')) },
+                  // Living component documentation — excluded from production builds.
+                  ...(import.meta.env.DEV
+                    ? [
+                        {
+                          path: paths.designSystem,
+                          lazy: page(() => import('@/pages/dev/DesignSystemPage')),
+                        },
+                      ]
+                    : []),
                   { path: '*', lazy: page(() => import('@/pages/NotFoundPage')) },
                 ],
               },

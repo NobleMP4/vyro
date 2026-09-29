@@ -72,4 +72,21 @@ describe('Settings', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'));
     expect(api.callsTo('DELETE /users/me')[0].body).toEqual({ password: 'MotDePasse1' });
   });
+
+  it('toggles the gamification preference', async () => {
+    const user = userEvent.setup();
+    const { api } = renderApp('/settings', {
+      routes: {
+        'PATCH /users/me/profile': () =>
+          json(makeUser({ profile: { gamificationEnabled: false } })),
+      },
+    });
+
+    const toggle = await screen.findByRole('switch', { name: 'Gamification' });
+    expect(toggle).toBeChecked();
+    await user.click(toggle);
+
+    await waitFor(() => expect(toggle).not.toBeChecked());
+    expect(api.callsTo('PATCH /users/me/profile')[0].body).toEqual({ gamificationEnabled: false });
+  });
 });

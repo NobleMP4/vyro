@@ -5,7 +5,7 @@
 VYRO est une plateforme sportive personnelle : entraînements, activités, poids, objectifs, records,
 statistiques et progression, réunis dans une PWA moderne, mobile-first et installable.
 
-> **Statut : Phase 2 — Authentification terminée.** Comptes, sessions sécurisées, onboarding,
+> **Statut : Phase 3 — Design System terminée.** Comptes, sessions sécurisées, onboarding,
 > profil et paramètres de compte fonctionnent de bout en bout. Les fonctionnalités sportives
 > (entraînements, poids…) arrivent phase par phase — voir [`docs/roadmap.md`](docs/roadmap.md).
 
@@ -98,7 +98,7 @@ npm install
 npm run dev
 ```
 
-Application : <http://localhost:5173>
+Application : <http://localhost:5173> — design system : <http://localhost:5173/design-system> (dev)
 
 ---
 
