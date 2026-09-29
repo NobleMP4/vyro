@@ -83,4 +83,18 @@ describe('AllExceptionsFilter', () => {
     expect(JSON.stringify(body)).not.toContain('secrets');
     expect(body).not.toHaveProperty('stack');
   });
+
+  it('explains in the logs when a migration was not applied', () => {
+    const { host, status, json } = createHost();
+    const log = jest.spyOn(filter['logger'], 'error').mockImplementation(() => undefined);
+    const error = new Prisma.PrismaClientKnownRequestError('The column does not exist', {
+      code: 'P2022',
+      clientVersion: 'test',
+    });
+    filter.catch(error, host);
+
+    expect(status).toHaveBeenCalledWith(500);
+    expect(json).toHaveBeenCalledWith(expect.objectContaining({ code: ErrorCode.INTERNAL_ERROR }));
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('npx prisma migrate dev'));
+  });
 });

@@ -102,6 +102,20 @@ Application : <http://localhost:5173>
 
 ---
 
+### Après chaque `git pull`
+
+Les nouvelles phases ajoutent des dépendances et des migrations :
+
+```bash
+cd BackEnd && npm install && npx prisma migrate dev
+cd ../FrontEnd && npm install
+```
+
+Symptômes typiques si on l'oublie : `Failed to resolve import "…"` (FrontEnd) ou
+`The column … does not exist` (BackEnd).
+
+---
+
 ## Variables d'environnement
 
 | Fichier                   | Variable             | Rôle                                                  |

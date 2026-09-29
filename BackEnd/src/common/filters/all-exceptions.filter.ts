@@ -46,6 +46,16 @@ const INTERNAL: NormalizedError = {
   message: 'Une erreur inattendue est survenue.',
 };
 
+/** P2021: table missing, P2022: column missing — a migration was not applied. */
+const OUTDATED_SCHEMA_CODES = new Set(['P2021', 'P2022']);
+
+function isOutdatedSchema(exception: unknown): boolean {
+  return (
+    exception instanceof Prisma.PrismaClientKnownRequestError &&
+    OUTDATED_SCHEMA_CODES.has(exception.code)
+  );
+}
+
 /**
  * Turns every thrown value into the single VYRO error shape:
  * `{ statusCode, code, message, details?, path, timestamp }`.
@@ -66,6 +76,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         `${request.method} ${request.url} → ${error.statusCode}`,
         exception instanceof Error ? exception.stack : String(exception),
       );
+      if (isOutdatedSchema(exception)) {
+        this.logger.error(
+          'The database schema is behind the code: run `npx prisma migrate dev` in BackEnd/ ' +
+            '(or `npm run prisma:deploy` in production).',
+        );
+      }
     }
 
     const body: ErrorResponseDto = {
