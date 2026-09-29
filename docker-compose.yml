@@ -1,0 +1,27 @@
+# Local development infrastructure for VYRO.
+# Only MySQL runs in Docker; FrontEnd and BackEnd run with npm for fast reloads.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: vyro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-vyro_root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-vyro}
+      MYSQL_USER: ${MYSQL_USER:-vyro}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-vyro}
+    ports:
+      - '${MYSQL_PORT:-3306}:3306'
+    volumes:
+      - vyro-mysql-data:/var/lib/mysql
+      # Grants the app user the rights Prisma needs for its shadow database.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-p${MYSQL_ROOT_PASSWORD:-vyro_root}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  vyro-mysql-data:
